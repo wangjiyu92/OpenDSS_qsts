@@ -1,0 +1,50 @@
+Clear
+
+
+New Circuit.Test_SI bus1=501_pri pu=1.03 basekV=12.0 !R1=1.306 X1=0.45773 R0=1.236 X0=1.31275
+
+new transformer.S1 phases=3 windings=2 buses=[501_pri 501] conns=[wye wye] kvs=[12 12] kvas=[15000 15000] XHL=0.01 %LoadLoss=0.01
+!ppm=0.0
+new regcontrol.S1 transformer=S1 winding=2 vreg=126 band=2 ptratio=57.73 ptphase=min enabled=True delay=0 !delay=30 !enable for baseline run
+
+
+
+! **** DEFINE WIRE DATA 
+new wiredata.conductor Runits=mi Rac=0.306 GMRunits=ft GMRac=0.0244  Radunits=in Diam=0.721 
+new wiredata.neutral   Runits=mi Rac=0.592 GMRunits=ft GMRac=0.00814 Radunits=in Diam=0.563 
+
+
+
+New Linecode.LC1 units=km nphases=3 Rmatrix=(1.23010 0.26290 0.26290 | 0.26290 1.23010 0.26290 | 0.26290 0.26290 1.23010 ) Xmatrix=(0.24202 0.07863 0.07863 | 0.07863 0.24202 0.07863 | 0.07863 0.07863 0.24202 ) normamps=130.0 emergamps=143.0
+
+new line.line1 Units=km length=15 bus1=501.1.2.3 bus2=502.1.2.3 phases=3 Linecode=LC1
+
+New LoadShape.L1 npts=24 minterval=[60] mult=(File=L1.csv) Action=Normalize
+New LoadShape.P1 npts=24 minterval=[60] mult=(File=PVshape.csv) Action=Normalize
+
+New load.L1_1 bus1=502,1 model=1 kW=20 pf=0.95 kV=6.928 Phases=1 daily=L1
+New load.L1_2 bus1=502.2 model=1 kW=50 pf=0.95 kV=6.928 Phases=1 daily=L1
+New load.L1_3 bus1=502.3 model=1 kW=20 pf=0.95 kV=6.928 Phases=1 daily=L1
+
+New PVSystem.P1 bus1=502.1 phases=1 kV=6.928 kVA=1500 Pmpp=1000 Model=1 pf=1 %cutin=0.1 %cutout=0.1 daily=P1
+
+
+New Monitor.L1_V element=Load.L1_1 terminal=1 mode=0
+New Monitor.L1_L element=Load.L1_1 terminal=1 mode=1
+New Monitor.P1_V element=PVSystem.P1 terminal=1 mode=0
+New Monitor.P1_L element=PVSystem.P1 terminal=1 mode=1
+
+set maxcontroliter=1000
+
+
+Set Voltagebases=[12.0, 6.928]
+
+Calcvoltagebases
+
+!Solve
+
+
+
+
+
+
